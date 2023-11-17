@@ -1,0 +1,30 @@
+## Only a .cf file is submitted, everything else should be ignored.
+## We use the method described at https://www.howtogeek.com/devops/how-to-set-up-gitignore-as-a-whitelist/
+
+## Note: If you do not use BNFC to generate the parser, this .gitignore will need substantial changes...
+
+## Generic
+##########
+
+# First, ignore everything
+*
+
+# White-list directories, but not their contents.
+# Needed so that git even starts looking for white-listed stuff in directories.
+!*/
+
+# Track this file itself.
+!.gitignore
+
+## Specific
+###########
+
+# Track the solution file
+!CC.cf
+
+# Track the other files of the stub, since they come shipped.
+!README.md
+!run-test-*.sh
+!testsuite/**
+
+## EOF

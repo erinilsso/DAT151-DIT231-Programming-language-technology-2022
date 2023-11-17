@@ -1,0 +1,139 @@
+-- Lab 1: Parser for a fragment of C++
+-- Programming Language Technology, 2021
+
+--Programs
+--A program is a sequence of definitions. (1)
+Prg. Program ::= Defs;
+
+--Definitions
+DefNil. Defs ::= ;
+DefCons. Defs ::= Def Defs;
+
+DFun. Def ::= Type Id Args Block ;
+DFunNoBlock. Def ::= Type Id Args ";" ;
+DUsing. Def ::= "using" QId ";" ;
+DTypeDef. Def ::= "typedef" Type Id ";" ;
+DDecl. Def ::= Type [SingleDeclarations] ";";
+
+--Argument lists, declarations, and function bodies
+NoADecls. Args ::= "(" ")";
+SomeADecls. Args ::= "(" ArgList ")";
+
+ArgListSg. ArgList ::= Arg;
+ArgListCons. ArgList ::= Arg "," ArgList;
+
+AArg. Arg ::= Type;
+AArgId. Arg ::= Type Id;
+AArgIdInit. Arg ::= Type Id "=" Exp ;
+
+--Statements
+SExp. Stm ::= Exp ";" ;
+
+--Variable declarations followed by a semicolon. (2)
+SSingDecl. SingleDeclarations ::= Id;
+SSingDeclAss. SingleDeclarations ::= Id "=" Exp;
+SDecls. Stm ::= Type [SingleDeclarations] ";" ;
+
+separator nonempty SingleDeclarations "," ;
+
+--Statements returning an expression (1)
+SReturn. Stm ::= "return" Exp ";" ;
+
+--While loops, with an expression in parentheses followed by a statement. (3)
+SWhile. Stm ::= "while" "(" Exp ")" Stm ;
+
+--Do-while loops, with an expression in parentheses after the loop body. (6)
+SDoWhile. Stm ::= "do" Stm "while" "(" Exp ")" ";" ;
+
+--For loops, with a declaration and two expressions in parentheses followed by a statement. (6)
+SFor. Stm ::= "for" "(" Type SingleDeclarations ";" Exp ";" Exp ")" Stm ;
+
+--Conditionals: if with an expression in parentheses followed by a statement and optionally by else and a statement. (3)
+SIf. Stm ::= "if" "(" Exp ")" Stm ;
+SIfElse. Stm ::= "if" "(" Exp ")" Stm "else" Stm;
+
+--Blocks: any list of statement (including empty list) between curly brackets. (3)
+SBlock2. Stm ::= Block ;
+SBlock. Block ::= "{" [Stm] "}" ;
+
+separator Stm "" ;
+
+--Type definitions: a type and a name for it. (3)
+STypeDef. Stm ::= "typedef" Type Id ";" ;
+
+token Charus ('\'' char '\'');
+--Expressions
+--The following table gives the expressions, their precedence levels, and their associativity.
+EInt. Exp15 ::= Integer ;
+EDouble. Exp15 ::= Double ;
+EChar. Exp15 ::= Charus;
+EString. Exp15 ::= [String] ;
+ETrue. Exp15 ::= "true" ;
+EFalse. Exp15 ::= "false" ;
+EQId. Exp15 ::= QId ;
+EIndex. Exp14 ::= Exp14 "[" Exp "]" ;
+EFuncCall. Exp14 ::= Exp14 "(" [Exp] ")" ;
+EDot. Exp14 ::= Exp14 "." Exp15 ;
+EArrow. Exp14 ::= Exp14 "->" Exp15 ;
+EIncr. Exp14 ::= Exp14 "++" ;
+EDecr. Exp14 ::= Exp14 "--" ;
+EAddRight. Exp13 ::= "++" Exp13 ;
+ESubRight. Exp13 ::= "--" Exp13 ;
+EDeref. Exp13 ::= "*" Exp13 ;
+ENeg. Exp13 ::= "!" Exp13 ;
+EMul. Exp12 ::= Exp12 "*" Exp13 ;
+EDiv. Exp12 ::= Exp12 "/" Exp13 ;
+ERem. Exp12 ::= Exp12 "%" Exp13 ;
+EAdd. Exp11 ::= Exp11 "+" Exp12 ;
+ESub. Exp11 ::= Exp11 "-" Exp12 ;
+ELShift. Exp10 ::= Exp10 "<<" Exp11 ;
+ERShift. Exp10 ::= Exp10 ">>" Exp11 ;
+EGreat. Exp9 ::= Exp9 ">" Exp10 ;
+ELess. Exp9 ::= Exp9 "<" Exp10 ;
+EGreatEq. Exp9 ::= Exp9 ">=" Exp10 ;
+ELessEq. Exp9 ::= Exp9 "<=" Exp10 ;
+EEq. Exp8 ::= Exp8 "==" Exp9 ;
+ENotEq. Exp8 ::= Exp8 "!=" Exp9 ;
+EConj. Exp4 ::= Exp4 "&&" Exp5 ;
+EDisj. Exp3 ::= Exp3 "||" Exp4 ;
+EAssig. Exp2 ::= Exp3 "=" Exp2 ;
+EAddAssig. Exp2 ::= Exp3 "+=" Exp2 ;
+ESubAssig. Exp2 ::= Exp3 "-=" Exp2 ;
+ECond. Exp2 ::= Exp3 "?" Exp ":" Exp2;
+EThrow. Exp1 ::= "throw" Exp1 ;
+
+coercions Exp 15 ;
+separator Exp "," ;
+separator nonempty String "" ;
+
+--qualified constants
+QCons. QId ::= [Id] ;
+separator nonempty Id "::" ;
+
+--Types
+--1 Built-in types: int (1), bool, char, double, void.
+TInt. ConcreteType ::= "int";
+TBool. ConcreteType ::= "bool";
+TChar. ConcreteType ::= "char";
+TDouble. ConcreteType ::= "double";
+TVoid. ConcreteType ::= "void";
+
+--2 Qualified constants, including plain identifiers (1), e.g. string.
+TQId. ConcreteType ::= QId; 
+
+--3 A type preceded by qualifier const (4), e.g. const int.
+TCons. Type ::= "const" ConcreteType;
+TCons. Type ::= ConcreteType;
+
+--4 Type references. (4)
+TRef. ConcreteType ::= ConcreteType "&";
+
+--Identifiers
+token Id letter (letter | digit |'_')*;
+
+--Comments
+comment "/*" "*/";
+
+comment "//";
+
+comment "#";

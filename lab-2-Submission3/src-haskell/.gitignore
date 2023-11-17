@@ -1,0 +1,7 @@
+/CMM/
+/dist-newstyle/
+/.stack-work/
+*.hi
+*.o
+stack.yaml.lock
+/lab2

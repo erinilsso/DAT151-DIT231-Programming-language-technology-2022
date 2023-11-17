@@ -1,0 +1,8 @@
+*~
+*.class
+*.j
+*.hi
+*.o
+stack*.yaml.lock
+/dist-newstyle/
+/.stack-work/
